@@ -1,4 +1,4 @@
--- Active: 1673908406077@@127.0.0.1@3306
+
 -- Criar tabela
 CREATE TABLE users (
     id TEXT PRIMARY KEY UNIQUE NOT NULL,
@@ -45,11 +45,12 @@ INSERT INTO products (id, name, price, category)
  ("b02", "condicionador", 40.00,"higiene");
 
  INSERT INTO products(id, name, price, category)
-VALUES ("b03", "sabonete", 6.80, "higiene");
 
+VALUES ("b03", "sabonete", 6.80, "higiene");
 
 INSERT INTO products (id, name, price, category)
  VALUES ("b04","agua", 1.20, "bebidas");
+
 
 --TA DANDO ERRO
  INSERT INTO products (id, name, price, category)
@@ -94,4 +95,5 @@ OFFSET 1;
 
 SELECT * FROM products
 WHERE price > 2.0 AND price <10.0;
+
 
