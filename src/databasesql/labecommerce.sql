@@ -1,3 +1,4 @@
+-- Active: 1674065612185@@127.0.0.1@3306
 -- Criar tabela
 
 CREATE TABLE
@@ -15,12 +16,6 @@ PRAGMA table_info ('users');
 
 DROP TABLE users;
 
-CREATE TABLE
-    users (
-        id TEXT PRIMARY KEY UNIQUE NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT UNIQUE NOT NULL
-    );
 
 --populando tabea
 
@@ -135,6 +130,7 @@ SELECT * FROM users ORDER BY email ASC;
 SELECT * FROM products ORDER BY price ASC LIMIT 20 OFFSET 1;
 
 SELECT * FROM products WHERE price > 2.0 AND price <10.0;
+--x--
 
 CREATE TABLE
     purchases(
@@ -177,3 +173,22 @@ SELECT * FROM users
 INNER JOIN purchases
 ON buyer_id = users.id
 WHERE users.id = "a01";
+---x---
+CREATE TABLE purchases_products
+(purchase_id TEXT NOT NULL,
+product_id TEXT NOT NULL,
+quantity INTEGER NOT NULL);
+
+INSERT INTO purchases_products (purchase_id,product_id, quantity)
+VALUES ( "b03","p01", 5),
+( "b01","p02", 3),
+( "b02","p03",2),
+("b04","p04", 6);
+
+SELECT * FROM purchases_products
+INNER JOIN purchases
+ON purchases_products.product_id = purchases.id
+INNER JOIN products
+ON purchases_products.purchase_id = products.id;
+
+DROP TABLE purchases_products;
