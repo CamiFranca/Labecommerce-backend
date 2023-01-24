@@ -7,15 +7,19 @@ import { Categoria } from "./types"
 export const users: TUsers[] = [  //porque é um array de objetos
     {
         id: 'fulano',
+        name:"Fulano",
         email: 'fulano@gmail.com',
         password: 'abc',
+        createdAt:"http..."
 
     },
 
     {
         id: 'ciclano',
+        name:"ciclano",
         email: 'ciclano@gmail.com',
         password: 'def',
+        createdAt: "http..."
 
     }
 
@@ -27,12 +31,16 @@ export const products: TProducts[] = [
     {
         id: '01',
         name: 'shampoo',
+        description:"L'oreal",
+        imageUrl:"http...",
         price: 6.00,
         category: Categoria.ELECTRONICS,
     },
     {
         id: '02',
         name: 'condicionador',
+        description:"L'oreal",
+        imageUrl:"http...",
         price: 8.00,
         category: Categoria.ELECTRONICS,
     }
@@ -58,11 +66,13 @@ export const purchases: TPurchase[] = [
 
 
 
-export const createUser = (id: string, email: string, password: string): string => {
+export const createUser = (id: string,name:string, email: string, password: string, createdAt:string): string => {
     const newUser: TUsers = {
         id: id,
+        name: name,
         email: email,
         password: password,
+        createdAt:createdAt
     }
     users.push(newUser)
     return 'Cadastro realizado com sucesso'
@@ -72,10 +82,12 @@ export const getAllUsers = (): TUsers[] => {
     return users
 }
 
-export const createProduct = (id: string, name: string, price: number, category: string): string => {
+export const createProduct = (id: string, name: string, description:string, imageUrl:string, price: number, category: string): string => {
     const newProduct = {
         id: id,
         name: name,
+        description,
+        imageUrl,
         price: price,
         category: category,
     }

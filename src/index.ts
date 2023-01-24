@@ -10,6 +10,7 @@ import {
 import { TUsers, TProducts, TPurchase, Categoria } from "./types"
 import express, { Request, Response } from 'express'
 import cors from 'cors'
+import { db } from './databasesql/knex'
 
 
 const app = express()
@@ -26,9 +27,9 @@ console.log('USERS', users)
 console.log('PRODUCT', products)
 console.log('PURCHASES', purchases)
 //Aula 03
-console.table(createUser('cami', 'cami@gmail.com', '123456'))
+console.table(createUser('cami',"Camilla", 'cami@gmail.com',"http...", '123456'))
 console.log(getAllUsers())
-console.log(createProduct('03', 'TV', 3.200, 'eletronico'))
+console.log(createProduct('03', 'TV',"LG","http...",3.200, 'eletronico'))
 console.log(getAllProducts())
 console.log(getProductById('03'))
 
@@ -38,87 +39,93 @@ app.get('/ping', (req: Request, res: Response) => {
 
     res.send('pong')
 })
-//-----------------------------Aula 7---------------------------------
-app.get('/users', (req: Request, res: Response) => {
+
+//----------------------------------Aula 12---------------------------------
+app.get("/users", async (req: Request, res: Response) => {
+
     try {
-        res.status(200).send(users)
-    } catch (error) {
-        console.log(error)
+        const result = await db.raw(`SELECT * FROM users`)
 
-        if (res.statusCode === 200) {
-            res.status(500)
-        }
-        res.send(error.message)
-
-    }
-})
-//---------------------------aula 6---pegar todos os usuarios-----------------
-// app.get('/users',(req: Request, res: Response)=>{
-// res.status(200).send(users)
-
-// })
-//---------------------buscar todos os produtos----------aula 7-----------------
-app.get('/products', (req: Request, res: Response) => {
-    try {
-        res.status(200).send(products)
-
-    } catch (error) {
-        console.log(error)
-        if (res.statusCode === 200) {
-            res.status(500)
-        }
-        res.send(error.message)
-    }
-})
-//-----------------------------------------------------------------------------
-
-// app.get('/products', (req: Request, res: Response) => {
-//     res.status(200).send(products)
-// })
-//--------------------------AULA 7--buscar um produto-------------------------
-
-app.get('/products/search', (req: Request, res: Response) => {
-    try {
-        const q = req.query.q as string
-
-        const result = products.filter((pro) => {
-            return pro.name.toLowerCase().includes(q.toLowerCase())
-        })
-        if (q.length <= 0) {
-            res.status(400)
-            throw new Error('o querry precisa de um parametro')
-        }
         res.status(200).send(result)
 
     } catch (error) {
         console.log(error)
+
         if (res.statusCode === 200) {
             res.status(500)
         }
-        res.send(error.message)
+
+        if (error instanceof Error) {
+            res.send(error.message)
+        } else {
+            res.send("Erro inesperado")
+        }
+    }
+
+})
+//----------------------------------Aula 12---------------------------------
+
+
+app.get("/products", async (req: Request, res: Response) => {
+
+    try {
+        const result = await db.raw(`SELECT * FROM products`)
+        res.status(200).send(result)
+
+    } catch (error) {
+        console.log(error)
+
+        if (res.statusCode === 200) {
+            res.status(500)
+        }
+
+        if (error instanceof Error) {
+            res.send(error.message)
+        } else {
+            res.send("Erro inesperado")
+        }
+
     }
 })
-//------------------------aula 6 criar usuário-----------------------------------
-// app.get('/products/search', (req: Request, res: Response) => {
+//---------------------------------aula 12 --------------------------------
 
-//     const q = req.query.q as string
-
-//     const result = products.filter((pro) => {
-//         return pro.name.toLowerCase().includes(q.toLowerCase())
-//     })
-
-//     res.status(200).send(result)
-
-// })
-//-----------------------------------AULA 7---riar usuario-----------------------------
-app.post("/users", (req: Request, res: Response) => {
+app.get('/products/search', async (req: Request, res: Response) => {
     try {
-        const { id, email, password } = req.body as TUsers
+
+        const name = req.query.name
+        const result = await db.raw(`SELECT * FROM products
+                                    WHERE name = "${name}"`)
+        if(result.length <1){
+            res.status(400)
+            throw new Error ("A query precisa de um parâmetro ")
+        }
+        res.status(200).send(result)
+
+    } catch (error) {
+        if (res.statusCode === 200) {
+            res.status(500)
+        }
+
+        if (error instanceof Error) {
+            res.send(error.message)
+        } else {
+            res.send("Erro inesperado")
+        }
+    }
+
+})
+//---------------------------------aula 12 --------------------------------
+
+app.post("/users", async(req: Request, res: Response) => {
+    try {
+        const { id, name, email, password, createdAt } = req.body as TUsers
 
         const newUser: TUsers = {
             id,
+            name,
             email,
-            password
+            password,
+            createdAt
         }
 
         if (id !== undefined) {
@@ -175,9 +182,13 @@ app.post("/users", (req: Request, res: Response) => {
 
         if (userEmail.length >= 1) {
             res.status(422)
-            throw new Error('esse e-mail já está cadastrado')
+            throw new Error('É preciso enviar um e-mail')
         }
-
+        await db.raw(`
+        INSERT INTO users (id, name, email, password, createdAt)
+        VALUES ("${id}", "${email}", "${name}","${password}","${createdAt}");
+        
+        `)
         users.push(newUser)
         res.status(200).send("Usuário criado com sucesso")
 
@@ -191,42 +202,23 @@ app.post("/users", (req: Request, res: Response) => {
 
     }
 })
-//-----------------------------------------------------------------------------
-// app.post("/users", (req: Request, res: Response) => {
-//     const { id, email, password } = req.body as TUsers
-//     const newuser = {
-//         id,
-//         email,
-//         password
-//     }
+//-------------------------------------aula12 --------------------------------------
+app.post("product", async(req: Request, res: Response)=>{
 
-//     users.push(newuser)
-//     res.status(200).send(users)
-// })
-//--------------------------------Aula 7---------------------------------------------
-
-try {
-
-} catch (error) {
-
-}
-
-
-//---------------------------aula 6--criar produto-------------------------------
-app.post("/products", (req: Request, res: Response) => {
-    const { id,
-        name,
-        price,
-        category } = req.body as TProducts
-    const newproduct = {
-        id,
-        name,
-        price,
-        category
+   try {
+    const { id, name, description, imageUrl, price, category } = req.body as TProducts
+    const newProduct : TProducts = { 
+     id,
+     name,
+     description,
+     imageUrl,
+     price,
+     category
     }
-
-    products.push(newproduct)
-    res.status(200).send(users)
+    if()
+   } catch (error) {
+    
+   }
 })
 //--------------------------Aula 6--criar compra-----------------------------------
 app.post("/purchases", (req: Request, res: Response) => {
@@ -269,17 +261,6 @@ app.get("/users/:id/purchases", (req: Request, res: Response) => {
     }
 
 })
-
-//-------------------------pegar compra--aula 6---------------------------------------------
-
-// app.get("/users/:id/purchases", (req: Request, res: Response) => {
-
-//     const id = req.params.id
-//     const result = products.find((product) => {
-//         return product.id === id
-//     })
-//     res.status(200).send(result)
-// })
 //-----------------------------aula 7----deletar produto----------------------------------
 app.delete("/products/:id", (req: Request, res: Response) => {
 
@@ -309,21 +290,6 @@ app.delete("/products/:id", (req: Request, res: Response) => {
         res.send(error.message)
     }
 })
-//----------------------------aula 06----deletar produto-----------------------
-
-// app.delete("/products/:id", (req: Request, res: Response) => {
-
-//     const id = req.params.id
-//     const productIndex = products.findIndex((product) => {
-//         return product.id === id
-//     })
-//     if (productIndex >= 0) {
-//         products.splice(productIndex, 1)
-//         res.status(200).send("Produto apagado com sucesso")
-//     } else {
-//         res.status(400).send("Produto não encontrado")
-//     }
-// })
 //---------------------------deletar usuario---aula 7-----------------------------
 app.delete('/users/:id', (req: Request, res: Response) => {
     try {
@@ -351,20 +317,6 @@ app.delete('/users/:id', (req: Request, res: Response) => {
 
 })
 
-// //----------------------------deletar usuário---aula 6--------------------------
-// app.delete('/users/:id', (req: Request, res: Response) => {
-
-//     const id = req.params.id
-//     const UserIndex = users.findIndex((user) => {
-//         return user.id === id
-//     })
-//     if (UserIndex >= 0) {
-//         users.splice(UserIndex, 1)
-//         res.status(200).send("usuário apagado com sucesso")
-//     } else {
-//         res.status(400).send("usuário apagado com sucesso")
-//     }
-// })
 //------------------------aula 7--mudar produto------------------------------
 app.put("/products/:id", (req: Request, res: Response) => {
     try {
@@ -428,31 +380,6 @@ app.put("/products/:id", (req: Request, res: Response) => {
     }
 })
 
-//------------------------aula 6--modificar produto--------------------------
-// app.put("/products/:id", (req: Request, res: Response) => {
-
-//     const id = req.params.id
-
-//     const newId = req.body.id as string | undefined
-//     const newName = req.body.name as string | undefined
-//     const newPrice = req.body.price as number | undefined
-//     const newCategory = Categoria.ELECTRONICS
-
-//     const product = products.find((product) => {
-//         return product.id === id
-//     })
-
-//     if (product) {
-//         product.id === newId || product.id
-//         product.name = newName || product.name
-//         product.price = isNaN(newPrice) ? product.price : newPrice
-//         product.category = newCategory || product.category
-//         res.status(200).send("item alterado com sucesso")
-
-//     } else {
-//         res.status(400).send("item não encontrado")
-//     }
-// })
 //-----------------------Aula 7 modificar usuário----------------------------
 app.put("/users/:id", (req: Request, res: Response) => {
 
@@ -486,7 +413,7 @@ app.put("/users/:id", (req: Request, res: Response) => {
                 res.status(400)
                 throw new Error("A senha precisa ser uma string")
             }
-     
+
         }
         if (!user) {
             res.status(400)
@@ -498,7 +425,7 @@ app.put("/users/:id", (req: Request, res: Response) => {
             user.password = newPassword || user.password
         }
         res.status(200).send("produto alterado co sucesso")
-        
+
     } catch (error) {
         if (res.statusCode === 200) {
             res.status(500)
@@ -506,25 +433,3 @@ app.put("/users/:id", (req: Request, res: Response) => {
         res.send(error.message)
     }
 })
-//-----------------------Aula 6 modificar usuário----------------------------
-// app.put("/users/:id", (req: Request, res: Response) => {
-
-//     const id = req.params.id
-
-//     const newId = req.body.id as string | undefined
-//     const newEmail = req.body.email as string | undefined
-//     const newPassword = req.body.password as string | undefined
-
-//     const user = users.find((user) => {
-//         return user.id === id
-//     })
-
-//     if (user) {
-//         user.id === newId || user.id
-//         user.email = newEmail || user.email
-//         user.password = newPassword || user.password
-
-//     } else {
-//         res.status(400).send("item não encontrado")
-//     }
-// })
