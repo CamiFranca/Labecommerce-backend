@@ -4,9 +4,13 @@
 CREATE TABLE
     users (
         id TEXT PRIMARY KEY UNIQUE NOT NULL,
+        name TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
-        password UNIQUE NOT NULL
+        password UNIQUE NOT NULL,
+        createdAt TEXT NOT NULL
     );
+ 
+
 
 --verificar tabela
 
@@ -20,8 +24,8 @@ DROP TABLE users;
 --populando tabea
 
 INSERT INTO
-    users (id, email, password)
-VALUES ('a01', 'cami@gmail.com', 'a01');
+    users (id,name, email, password, createdAt)
+VALUES ('a01','Camilla', 'cami@gmail.com', 'a01', "http...");
 
 --verificar tabela
 
@@ -32,12 +36,16 @@ INSERT INTO
 VALUES
 (
         'a02',
+        'fulano',
         'fulano@gmail.com',
-        'a02'
+        'a02',
+        "http..."
     ), (
         "a03",
+        'ciclano',
         "ciclano@gmail.com",
-        "a03"
+        "a03",
+        "http..."
     );
 
 --tabela de produtos
@@ -107,12 +115,16 @@ INSERT INTO
     users (id, email, password)
 VALUES (
         'a05',
+        'pessoa',
         'pessoa@pessoa.com',
-        'a05'
+        'a05',
+        "http..."
     ), (
         'a04',
         "maricota@gmail.com",
-        'a04'
+        'maricota'
+        'a04',
+        "http..."
     ), ("a06", 'eno@gmail.com', 'a06');
 
 SELECT * FROM products WHERE id = 'b02';
