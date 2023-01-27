@@ -12,137 +12,105 @@ CREATE TABLE
  
 
 
---verificar tabela
 
 PRAGMA table_info ('users');
 
---deletar tabela
-
-DROP TABLE users;
-
-
---populando tabea
-
 INSERT INTO
-    users (id,name, email, password, createdAt)
-VALUES ('a01','Camilla', 'cami@gmail.com', 'a01', "http...");
-
---verificar tabela
-
-SELECT * FROM users;
-
-INSERT INTO
-    users (ID, email, password)
+    users (id, name, email, password, createdAt)
 VALUES
-(
+(       'a01',
+        'Camilla',
+        'cami@gmail.com',
+        'a01', 
+        "26/01/2023"
+  ),(
         'a02',
         'fulano',
         'fulano@gmail.com',
         'a02',
-        "http..."
+        "26/01/2023"
     ), (
         "a03",
         'ciclano',
         "ciclano@gmail.com",
         "a03",
-        "http..."
+        "26/01/2023"
+    ),
+     (
+        'a05',
+        'pessoa',
+        'pessoa@pessoa.com',
+        'a05',
+        "26/01/2023"
+    ), (
+        'a04',
+        "maricota@gmail.com",
+        'maricota',
+        'a04',
+        "26/01/2023"
+    ), (
+        "a06",
+        'Enno',
+        'enno@gmail.com',
+        'a06',
+        "26/01/2023"
     );
 
---tabela de produtos
+
 
 CREATE TABLE
     products (
         id TEXT PRIMARY KEY UNIQUE NOT NULL,
         name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        imageUrl TEXT NOT NULL,
         price REAL NOT NULL,
         category TEXT NOT NULL
     );
 
 SELECT * FROM products;
-
 INSERT INTO
-    products (id, name, price, category)
+    products (id, name, description, imageUrl, price, category)
 VALUES
 (
         "b01",
         "shampoo",
+        "L'oreal",
+        "https://picsum.photos/id/shampoo/400",
         35.00,
         "higiene"
-    );
 
-INSERT INTO
-    products (id, name, price, category)
-VALUES (
+    ),
+    (
         "b02",
         "condicionador",
+        "L'oreal",
+        "https://picsum.photos/id/condicionador/400",
         40.00,
         "higiene"
-    );
-
-INSERT INTO
-    products(id, name, price, category)
-VALUES (
+    ),
+    (
         "b03",
         "sabonete",
+        "L'oreal",
+        "https://picsum.photos/id/condicionador/400",
         6.80,
         "higiene"
-    );
-
-INSERT INTO
-    products (id, name, price, category)
-VALUES ("b04", "agua", 1.20, "bebidas");
-
---TA DANDO ERRO
-
-INSERT INTO
-    products (id, name, price, category)
-VALUES ("b05", "suco", 4.00, "bebidas");
-
--- exercicio aula 09
-
-SELECT * FROM products WHERE name = "shampoo";
-
-INSERT INTO
-    products (id, name, price, category)
-VALUES (
+    ),
+    (   "b05",
+        "suco",
+        "caixinha",
+        "https://picsum.photos/id/suco/400",
+        4.00, 
+        "bebidas"
+    ),(
         'b06',
         'granola',
+        "saquinho",
+        "https://picsum.photos/id/granola/400",
         7.50,
         'alimento'
     );
-
-INSERT INTO
-    users (id, email, password)
-VALUES (
-        'a05',
-        'pessoa',
-        'pessoa@pessoa.com',
-        'a05',
-        "http..."
-    ), (
-        'a04',
-        "maricota@gmail.com",
-        'maricota'
-        'a04',
-        "http..."
-    ), ("a06", 'eno@gmail.com', 'a06');
-
-SELECT * FROM products WHERE id = 'b02';
-
-DELETE FROM users WHERE id = "b04";
-
-DELETE FROM products WHERE id = "a02";
-
-UPDATE users SET password = 'AB01' WHERE id= 'a01';
-
-UPDATE products SET price = 10.0 WHERE id = "b01";
-
-SELECT * FROM users ORDER BY email ASC;
-
-SELECT * FROM products ORDER BY price ASC LIMIT 20 OFFSET 1;
-
-SELECT * FROM products WHERE price > 2.0 AND price <10.0;
---x--
 
 CREATE TABLE
     purchases(
@@ -151,11 +119,10 @@ CREATE TABLE
         paid INTEGER NOT NULL,
         delivered_at TEXT,
         buyer_id TEXT NOT NULL,
-        FOREIGN KEY (buyer_id) REFERENCES users(id)
+        FOREIGN KEY (buyer_id) REFERENCES users(id) --Referencia outra tabela
     );
 
 SELECT * FROM purchases;
-
 
 INSERT INTO
     purchases (
@@ -165,39 +132,38 @@ INSERT INTO
         delivered_at,
         buyer_id
     )
-VALUES ('p01', 40.00, 0, NULL,'a01'), 
-('p02', 22.00,0, NULL ,'a01'), 
+VALUES 
+('p01', 40.00, 0, NULL,'a01'), 
+('p02', 22.00, 0, NULL,'a01'), 
 ('p03', 20.00, 0, NULL,'a02'), 
 ('p04', 63.00, 0, NULL,'a02');
 
-DROP TABLE purchases;
-
-SELECT * FROM users;
-
-SELECT * FROM products;
-SELECT * FROM purchases;
 
 UPDATE purchases
 SET delivered_at = DATETIME('now')
 WHERE id = 'p02';
+DROP TABLE purchases;
+
 
 SELECT * FROM users
 INNER JOIN purchases
 ON buyer_id = users.id
 WHERE users.id = "a01";
----x---
-CREATE TABLE purchases_products
-(purchase_id TEXT NOT NULL,
+
+CREATE TABLE purchases_products(
+purchase_id TEXT NOT NULL,
 product_id TEXT NOT NULL,
 quantity INTEGER NOT NULL);
 
-INSERT INTO purchases_products (purchase_id,product_id, quantity)
-VALUES ( "b03","p01", 5),
-( "b01","p02", 3),
-( "b02","p03",2),
+INSERT INTO purchases_products (purchase_id, product_id, quantity)
+VALUES ( 
+"b03","p01", 5),
+("b01","p02", 3),
+("b02","p03",2),
 ("b04","p04", 6);
 
-SELECT * FROM purchases_products
+--Mostra a relação das três tabelas, interessante p ver qual é o produto e quantos dele foi comprado
+SELECT * FROM purchases;
 INNER JOIN purchases
 ON purchases_products.product_id = purchases.id
 INNER JOIN products
