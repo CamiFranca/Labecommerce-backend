@@ -9,4 +9,4 @@
 Rodar o script de dev ou buildar e rodar o de start.
 
 ### Documentação
---link do potsman
+https://documenter.getpostman.com/view/24460722/2s8ZDeUykH
