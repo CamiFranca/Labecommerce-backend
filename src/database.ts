@@ -34,7 +34,7 @@ export const products: TProducts[] = [
         description:"L'oreal",
         imageUrl:"http...",
         price: 6.00,
-        category: Categoria.ELECTRONICS,
+        category: Categoria.HIGIENE,
     },
     {
         id: '02',
@@ -42,7 +42,7 @@ export const products: TProducts[] = [
         description:"L'oreal",
         imageUrl:"http...",
         price: 8.00,
-        category: Categoria.ELECTRONICS,
+        category: Categoria.HIGIENE,
     }
 ]
 
