@@ -28,14 +28,6 @@ export type TPurchase = {
     total_price:number,
     paid:number,
     delivered_at:string,
+    create_at: string,
     buyer_id:string
 }
-
-
-export type TNewProduct ={
-    id : string,
-    totalPrice: number,
-    buyerId: string
-    products: TProducts[]
-
-   }
