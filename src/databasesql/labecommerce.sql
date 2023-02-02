@@ -1,4 +1,4 @@
--- Active: 1674065612185@@127.0.0.1@3306
+-- Active: 1675094188763@@127.0.0.1@3306
 -- Criar tabela
 
 CREATE TABLE
@@ -10,7 +10,7 @@ CREATE TABLE
         createdAt TEXT NOT NULL
     );
  
-SELECT * FROM users;
+
 INSERT INTO
     users (id, name, email, password, createdAt)
 VALUES
@@ -106,34 +106,30 @@ VALUES
         7.50,
         'alimento'
     );
-DROP TABLE purchases;
+SELECT * FROM purchases;
 CREATE TABLE
     purchases(
         id TEXT PRIMARY KEY UNIQUE NOT NULL,
         total_price REAL UNIQUE NOT NULL,
-        paid INTEGER NOT NULL,
-        delivered_at TEXT,
-        create_at TEXT,
+        paid INTEGER  DEFAULT (0) NOT NULL,
+        create_at TEXT DEFAULT(DATETIME()) NOT NULL,
         buyer_id TEXT NOT NULL,
         FOREIGN KEY (buyer_id) REFERENCES users(id) 
     );
-DROP TABLE purchases;
+
 INSERT INTO
     purchases (
         id,
         total_price,
-        paid,
-        delivered_at,
-        create_at,
         buyer_id
     )
 VALUES 
-('pr01', 40.00, 0, NULL, NULL,'u01'), 
-('pr02', 22.00, 0, NULL, NULL,'u01'), 
-('pr03', 20.00, 0, NULL, NULL,'u02'), 
-('pr04', 63.00, 0, NULL, NULL,'u02');
+('pr01', 40.00, 'u01'), 
+('pr02', 22.00, 'u01'), 
+('pr03', 20.00, 'u02'), 
+('pr04', 63.00, 'u02');
 
-
+SELECT * FROM purchases;
 UPDATE purchases
 SET delivered_at = DATETIME('now')
 WHERE id = 'p02';
@@ -164,3 +160,4 @@ INNER JOIN products
 ON purchases_products.purchase_id = products.id;
 
 DROP TABLE purchases_products;
+SELECT * FROM products;

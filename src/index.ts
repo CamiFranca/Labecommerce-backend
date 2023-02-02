@@ -1,6 +1,6 @@
-import { getParsedCommandLineOfConfigFile } from "typescript";
-import { users, products, purchases } from "./database";
-import { TUsers, TProducts, TPurchase, Categoria, } from "./types"
+import { getParsedCommandLineOfConfigFile, idText } from "typescript";
+import { users, products } from "./database";
+import { TUsers, TProducts, Categoria, TProductsArray } from "./types"
 import express, { Request, Response } from 'express'
 import cors from 'cors'
 import { db } from './databasesql/knex'
@@ -358,38 +358,31 @@ app.put("/products/:id", async (req: Request, res: Response) => {
         }
     }
 })
- 
+
 app.post("/purchases", async (req: Request, res: Response) => {
 
     try {
 
-        const { id,
-            totalPrice,
-            buyerId,
-            products
+        const { purchaseId,
+            buyerId
         } = req.body
 
-        const newPurchase = {
-            id: id,
-            total_price: totalPrice,
-            paid: 0,
-            buyer_id: buyerId
-        }
+        const productsArray: TProductsArray[] = req.body.productsArray
 
-        if (id !== undefined) {
+        if (purchaseId !== undefined) {
 
-            if (typeof id !== 'string') {
+            if (typeof purchaseId !== 'string') {
                 res.status(400)
-                throw new Error('o id deve ser tipo string')
+                throw new Error('o purchaseId deve ser tipo string')
             }
 
-            if (id.length <= 0) {
+            if (purchaseId.length <= 0) {
                 res.status(400)
-                throw new Error('o Id deve ter pelo menos um valor')
+                throw new Error('o purchaseId deve ter pelo menos um valor')
             }
-            if (id[0] !== "0") {
+            if (purchaseId[0] !== "p") {
                 res.status(400)
-                throw new Error('o Id deve começar com zero')
+                throw new Error("o Id deve começar com 'p' ")
             }
         }
         if (buyerId !== undefined) {
@@ -406,45 +399,45 @@ app.post("/purchases", async (req: Request, res: Response) => {
                 throw new Error('o buyerId deve começar com a letra u')
             }
         }
-        for (let i = 0; i < products.length; i++) {
-            const [validateProduct]  = await db("products").where({ id: products[i].id })
+   
 
-            if(typeof products[i].id === "undefined"){
+        for (let i in productsArray) {
+
+            const productIncarta = await db("products").where({ id: productsArray[i].id })
+
+            if (!productIncarta) {
                 res.status(400)
-                throw new Error("products é um array de objeto(s)");
+                throw new Error("Produto não cadastrado")
 
+            } else {
+                const newPurchaseproduct = {
+                    purchase_id: purchaseId,
+                    product_id: productsArray[i].id,
+                    quantity: productsArray[i].quantity
+                }
+                await db("purchases_products").insert(newPurchaseproduct)
             }
-            if (!validateProduct) {
-                res.status(404)
-                throw new Error("Produto não encontrado");
-            }
-            if (typeof products[i].id !== "string") {
-                res.status(400)
-                throw new Error("produto id precisa ser uma string");
-            }
-            if (typeof products[i].quantity !== "number" || products[i].quantity <= 0) {
-                res.status(400)
-                throw new Error("A compra precisa de um valor maior que 0");
-
-            }
-
         }
-       
+        const purchaseIncart = await db("purchases_products").where({ purchase_id: purchaseId })
+
+        let totalPrice = 0
+
+        const newPurchase = {
+            id: purchaseId,
+            buyer_id: buyerId,
+            total_price: totalPrice
+        }
+        for(let i of purchaseIncart){
+           const [product] = await db("products").where({id: i.product_id})
+            totalPrice += i.quantity * product.price
+            
+        }
+        newPurchase.total_price = totalPrice
+
         await db("purchases").insert(newPurchase)
+        console.log(newPurchase)
 
-        for (let i in products) {
-            const newProductPurchase = {
-                purchase_id: id,
-                product_id: products[i].produtoId,
-                quantity: products[i].quantity
-            }
-            console.log(newProductPurchase)
-
-            await db("purchases_products").insert(newProductPurchase)
-
-        }
-
-
+        
         res.status(200).send({ messege: 'Pedido realizado com sucesso' })
 
 
@@ -492,62 +485,6 @@ app.delete("/purchases/:id", async (req: Request, res: Response) => {
             res.send("Erro inesperado")
         }
 
-    }
-
-
-})
-
-app.get("/purchases/:id", async (req: Request, res: Response) => {
-
-    try {
-
-        const id = req.params.id
-
-        const [buy]: TPurchase[] | undefined[] = await db("purchases").where({ id: id })
-
-        if (buy) {
-            const [buy] = await db("purchases")
-                .select(
-                    "purchases.id AS purchaseId",
-                    "users.id AS buyerId",
-                    "users.name AS buyerName",
-                    "users.email AS buyerEmail ",
-                    "purchases.total_price AS totalPrice",
-                    "purchases.create_at AS createdAt",
-                    "purchases.paid AS paid",
-                    "purchases.delivered_at AS deliveredAt"
-
-                )
-                .innerJoin("users", "purchases.buyer_id", "=", "users.id")
-                .where({ "purchases.id": id })
-        }
-
-        const productList = await db("products")
-            .select(
-                "products.id AS id",
-                "products.name AS name",
-                "products.price AS price",
-                "products.description AS description",
-                "products.imageUrl",
-                "purchases_products.quantity"
-
-            )
-            .innerJoin("products", "purchases_products.product_id", "=", "products_id")
-            .where({ "products.id": id })
-
-        const result = ({ ...buy, products: productList })
-        res.status(200).send(result)
-
-    } catch (error) {
-        if (res.statusCode === 200) {
-            res.status(500)
-        }
-
-        if (error instanceof Error) {
-            res.send(error.message)
-        } else {
-            res.send("Erro inesperado")
-        }
     }
 
 

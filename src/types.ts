@@ -23,11 +23,8 @@ export type TProducts = {
     category: string,
 }
 
-export type TPurchase = {
-    id:string,
-    total_price:number,
-    paid:number,
-    delivered_at:string,
-    create_at: string,
-    buyer_id:string
+
+export type TProductsArray = {
+    id: string,
+    quantity: number
 }
