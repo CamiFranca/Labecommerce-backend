@@ -1,6 +1,6 @@
 import { TUsers } from "./types"
 import { TProducts } from "./types"
-import { TPurchase } from "./types"
+// import { TPurchase } from "./types"
 import { Categoria } from "./types"
 
 
@@ -48,21 +48,21 @@ export const products: TProducts[] = [
 
 
 
-export const purchases: TPurchase[] = [
-    {
-        userId: 'fulano',
-        productId: '01',
-        quantity: 2,
-        totalPrice: 8 * 2,
-    },
+// export const purchases: TPurchase[] = [
+//     {
+//         userId: 'fulano',
+//         productId: '01',
+//         quantity: 2,
+//         totalPrice: 8 * 2,
+//     },
 
-    {
-        userId: 'ciclano',
-        productId: '02',
-        quantity: 1,
-        totalPrice: 6 * 1,
-    }
-]
+//     {
+//         // userId: 'ciclano',
+//         productId: '02',
+//         quantity: 1,
+//         totalPrice: 6 * 1,
+//     }
+// ]
 
 
 
